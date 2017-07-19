@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from qzstory.items import QzstoryItem
+from qzstory.items import QzStorysItem,QzStoryItem
 
 class qzSpider(scrapy.Spider):
     name = 'qzspider'
@@ -13,21 +13,24 @@ class qzSpider(scrapy.Spider):
 #        yield scrapy.Request("http://www.gushi365.com/", headers={'User-Agent': "Hello"})
 
     def parse(self, response):
-        item = QzstoryItem()
+        item = QzStorysItem()
 
-        item['story_title'] = response.xpath('//article/figure/a/img/@alt').extract()
-        item['story_url'] = response.xpath('//article/figure/a/@href').extract()            
+        item['story_titles'] = response.xpath('//article/figure/a/img/@alt').extract()
+        item['story_urls'] = response.xpath('//article/figure/a/@href').extract()
+   
         yield item  
   
-        for url in item['story_url']:  
-            print url  
+        for url in item['story_urls']: 
+            title = item['story_titles'][item['story_urls'].index(url)]
             url = "http://www.gushi365.com/" + url  
 #            yield scrapy.Request(url, callback=self.parse_story,dont_filter=True,headers={'User-Agent': "Hello"})  
-            yield scrapy.Request(url, callback=self.parse_story,dont_filter=True,) 
+            yield scrapy.Request(url, callback=self.parse_story,dont_filter=True,meta={'title': title,'url': url}) 
     def parse_story(self, response):
-        item = QzstoryItem()
+        item = QzStoryItem()
+        item['story_title'] =  response.meta['title'] 
+        item['story_url'] =  response.meta['url']       
         item['story_content'] = response.xpath('//div[@class="single-content"]/span/p/text()').extract()
-        self.log('ITEM :: %s' % (item['story_content']))
+#        self.log('ITEM :: %s' % (item['story_content']))
         return item
         
 

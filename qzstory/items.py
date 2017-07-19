@@ -8,9 +8,12 @@
 import scrapy
 
 
-class QzstoryItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
+class QzStorysItem(scrapy.Item):
+    story_titles = scrapy.Field()
+    story_urls = scrapy.Field()    
+    pass
+
+class QzStoryItem(scrapy.Item):
     story_title = scrapy.Field()
     story_url = scrapy.Field()    
     story_content = scrapy.Field()     
